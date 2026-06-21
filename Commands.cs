@@ -109,7 +109,24 @@ class Commands
             Console.WriteLine("Failed to stop the service. This may require special permissions.");
         }
     }
-    public static void Stats(string name = ""){}
+    public static void Stats(string name)
+    {
+        Process currentProcess = Process.GetProcessesByName(name).FirstOrDefault();
+        if (currentProcess == null)
+        {
+            Console.WriteLine("Status:   disabled");
+            return;
+        }
+        currentProcess.Refresh();
+        Console.WriteLine("Status:   enabled");
+
+        TimeSpan uptime = DateTime.Now - currentProcess.StartTime;
+        Console.WriteLine($"Uptime:   {uptime}");
+        double cpuUsage = GetCPU(currentProcess);
+        Console.WriteLine($"CPU Usage:   {cpuUsage}%");
+        double ramUsage = currentProcess.WorkingSet64 / 1024.0 / 1024.0;
+        Console.WriteLine($"RAM Usage:   {ramUsage}Mb");
+    }
     public static void Dependencies(string name){}
     public static void Errors(){}
     public static void Problems(string name){}
@@ -148,5 +165,16 @@ class Commands
             response[1] = reader["Log"].ToString();
         }
         return response;
+    }
+    public static double GetCPU(Process process)
+    {
+        TimeSpan processTime1 = process.TotalProcessorTime;
+        DateTime realTime1 = DateTime.UtcNow;
+        Thread.Sleep(1000);
+        TimeSpan processTime2 = process.TotalProcessorTime;
+        DateTime realTime2 = DateTime.UtcNow;
+        double CpuUsage = (processTime2 - processTime1).TotalMilliseconds / ((realTime2 - realTime1).TotalMilliseconds * Environment.ProcessorCount) * 100;
+
+        return CpuUsage;
     }
 }

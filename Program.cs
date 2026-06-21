@@ -33,7 +33,7 @@ class Program
                     Commands.Stop(cmd_args[1]);
                     break;
                 case "stats":
-                    if (cmd_args.Length <2){Commands.Stats(); break;}
+                    if (cmd_args.Length <2){Console.WriteLine("Using the command: stats <name>"); break;}
                     Commands.Stats(cmd_args[1]);
                     break;
                 case "dependencies":
