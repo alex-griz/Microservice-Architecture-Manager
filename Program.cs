@@ -17,8 +17,8 @@ class Program
             switch (cmd_args[0])
             {
                 case "create":
-                    if (cmd_args.Length < 3) {Console.WriteLine("Using the command: create <name> <path> <log path (optional)>"); break;}
-                    Commands.Create(cmd_args[1], cmd_args[2],  cmd_args.ElementAtOrDefault(3) ?? "");
+                    if (cmd_args.Length < 3) {Console.WriteLine("Using the command: create <name> <path> <log path (optional)> <dependence1;dependence2 (optional)"); break;}
+                    Commands.Create(cmd_args[1], cmd_args[2],  cmd_args.ElementAtOrDefault(3) ?? "", cmd_args.ElementAtOrDefault(4) ?? "");
                     break;
                 case "remove":
                     if (cmd_args.Length < 2){Console.WriteLine("Using the command: remove <name>"); break;}
@@ -36,19 +36,19 @@ class Program
                     if (cmd_args.Length <2){Console.WriteLine("Using the command: stats <name>"); break;}
                     Commands.Stats(cmd_args[1]);
                     break;
-                case "dependencies":
-                    if (cmd_args.Length <2){Console.WriteLine("Using the command: dependencies <name>"); break;}
-                    Commands.Dependencies(cmd_args[1]);
-                    break;
                 case "errors":
-                    Commands.Errors();
+                    if (cmd_args.Length < 2){Console.WriteLine("Using command: errors <name>"); break;}
+                    Commands.Errors(cmd_args[1]);
                     break;
-                case "problems":
-                    if (cmd_args.Length < 2){Console.WriteLine("Using command: problems <name>"); break;}
-                    Commands.Problems(cmd_args[1]);
+                case "problems-analysis":
+                    Commands.Problems();
                     break;
                 case "list":
                     Commands.List();
+                    break;
+                case "edit":
+                    if (cmd_args.Length < 3) {Console.WriteLine("Using the command: edit <name> <new path> <new log path (optional)> <new dependence1;dependence2 (optional)"); break;}
+                    Commands.Edit(cmd_args[1], cmd_args[2],  cmd_args.ElementAtOrDefault(3) ?? "", cmd_args.ElementAtOrDefault(4) ?? "");
                     break;
                 case "exit":
                     return;

@@ -4,14 +4,15 @@ namespace MicroServiceManager;
 class Commands
 {
     private static readonly string connectionString = $"Data Source= Database/MSMData.db";
-    public static void Create(string name, string path, string log_path = "")
+    public static void Create(string name, string path, string log_path = "", string dependence_list = "")
     {
         if (Program.nameCache.Contains(name)) {Console.WriteLine("Service with this name already exists"); return;}
         using var connection = new SqliteConnection(connectionString);
-        using var command = new SqliteCommand("INSERT INTO Services (Name, Path, Log) VALUES (@N, @P, @L)", connection);
+        using var command = new SqliteCommand("INSERT INTO Services (Name, Path, Log, Dependencies) VALUES (@N, @P, @L, @D)", connection);
         command.Parameters.AddWithValue("@N", name);
         command.Parameters.AddWithValue("@P", path);
         command.Parameters.AddWithValue("@L", log_path);
+        command.Parameters.AddWithValue("@D", dependence_list);
 
         try
         {
@@ -127,9 +128,24 @@ class Commands
         double ramUsage = currentProcess.WorkingSet64 / 1024.0 / 1024.0;
         Console.WriteLine($"RAM Usage:   {ramUsage}Mb");
     }
-    public static void Dependencies(string name){}
-    public static void Errors(){}
-    public static void Problems(string name){}
+    public static void Errors(string name)
+    {
+        string path = GetData(name)[1];
+        if (string.IsNullOrEmpty(path))
+        {
+            Console.WriteLine("This service don't have log files!");
+            return;
+        }
+        foreach (string line in File.ReadLines(path))
+        {
+            string newLine = line.ToLower();
+            if (newLine.Contains("error"))
+            {
+                Console.WriteLine(line);
+            }
+        }
+    }
+    public static void Problems(){}
     public static void List()
     {
         using var connection = new SqliteConnection(connectionString);
@@ -151,11 +167,31 @@ class Commands
             Console.WriteLine("Error while loading list of services");
         }
     }
+    public static void Edit(string name, string path, string log_path = "", string dependence_list = "")
+    {
+        using var connection = new SqliteConnection(connectionString);
+        using var command = new SqliteCommand("UPDATE Services SET Path = @P, Log = @L, Dependencies= @D WHERE Name = @N", connection);
+        command.Parameters.AddWithValue("@N", name);
+        command.Parameters.AddWithValue("@P", path);
+        command.Parameters.AddWithValue("@L", log_path);
+        command.Parameters.AddWithValue("@D", dependence_list);
+        try
+        {
+            connection.Open();
+            command.ExecuteNonQuery();
+            Program.nameCache.Add(name);
+            Console.WriteLine("Service data updated successfully!");
+        }
+        catch
+        {
+            Console.WriteLine("Error while updating service data");
+        }
+    }
     public static string[] GetData(string name)
     {
         string[] response = ["",""];
         using var connection = new SqliteConnection(connectionString);
-        using var command = new SqliteCommand("SELECT * FROM Services WHERE Name = @N", connection);
+        using var command = new SqliteCommand("SELECT Path, Log FROM Services WHERE Name = @N", connection);
         command.Parameters.AddWithValue("@N", name);
         connection.Open();
         using var reader = command.ExecuteReader();
