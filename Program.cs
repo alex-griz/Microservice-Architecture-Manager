@@ -41,7 +41,7 @@ class Program
                     Commands.Errors(cmd_args[1]);
                     break;
                 case "problems-analysis":
-                    Commands.Problems();
+                    Commands.ProblemsAnalysis();
                     break;
                 case "list":
                     Commands.List();

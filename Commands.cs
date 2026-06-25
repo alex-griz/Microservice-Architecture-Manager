@@ -45,7 +45,7 @@ class Commands
     }
     public static void Run(string name)
     {
-        string path = GetData(name)[0];
+        string path = AppsData.GetData(name)[0];
         if (string.IsNullOrEmpty(path))
         {
             Console.WriteLine("Service with this name not found!");
@@ -95,7 +95,7 @@ class Commands
     }
     public static void Stop(string name)
     {
-        string processName = Path.GetFileNameWithoutExtension(GetData(name)[0]);
+        string processName = Path.GetFileNameWithoutExtension(AppsData.GetData(name)[0]);
         Process[] processes = Process.GetProcessesByName(processName);
         try
         {
@@ -112,25 +112,22 @@ class Commands
     }
     public static void Stats(string name)
     {
-        Process currentProcess = Process.GetProcessesByName(name).FirstOrDefault();
-        if (currentProcess == null)
+        int status = AppsData.GetStatus(name);
+        if (status == 0)
         {
             Console.WriteLine("Status:   disabled");
             return;
         }
-        currentProcess.Refresh();
         Console.WriteLine("Status:   enabled");
+        string[] metrics = AppsData.GetMetrics(name);
 
-        TimeSpan uptime = DateTime.Now - currentProcess.StartTime;
-        Console.WriteLine($"Uptime:   {uptime}");
-        double cpuUsage = GetCPU(currentProcess);
-        Console.WriteLine($"CPU Usage:   {cpuUsage}%");
-        double ramUsage = currentProcess.WorkingSet64 / 1024.0 / 1024.0;
-        Console.WriteLine($"RAM Usage:   {ramUsage}Mb");
+        Console.WriteLine($"Uptime:   {metrics[0]}");
+        Console.WriteLine($"CPU Usage:   {metrics[1]}%");
+        Console.WriteLine($"RAM Usage:   {metrics[2]}Mb");
     }
     public static void Errors(string name)
     {
-        string path = GetData(name)[1];
+        string path = AppsData.GetData(name)[1];
         if (string.IsNullOrEmpty(path))
         {
             Console.WriteLine("This service don't have log files!");
@@ -145,7 +142,6 @@ class Commands
             }
         }
     }
-    public static void Problems(){}
     public static void List()
     {
         using var connection = new SqliteConnection(connectionString);
@@ -187,30 +183,19 @@ class Commands
             Console.WriteLine("Error while updating service data");
         }
     }
-    public static string[] GetData(string name)
+    public static void ProblemsAnalysis()
     {
-        string[] response = ["",""];
-        using var connection = new SqliteConnection(connectionString);
-        using var command = new SqliteCommand("SELECT Path, Log FROM Services WHERE Name = @N", connection);
-        command.Parameters.AddWithValue("@N", name);
-        connection.Open();
-        using var reader = command.ExecuteReader();
-        while (reader.Read())
+        string[] names = Program.nameCache.ToArray();
+        double summary_ram = 0.0;
+        double summary_cpu = 0.0;
+        var status_list = new Dictionary<string, int>();
+        foreach (string name in names)
         {
-            response[0] = reader["Path"].ToString();
-            response[1] = reader["Log"].ToString();
+            status_list.Add(name,AppsData.GetStatus(name));
+            string[] metrics = AppsData.GetMetrics(name);
+            summary_cpu = summary_cpu + Convert.ToDouble(metrics[1]);
+            summary_ram = summary_ram + Convert.ToDouble(metrics[2]);
         }
-        return response;
-    }
-    public static double GetCPU(Process process)
-    {
-        TimeSpan processTime1 = process.TotalProcessorTime;
-        DateTime realTime1 = DateTime.UtcNow;
-        Thread.Sleep(1000);
-        TimeSpan processTime2 = process.TotalProcessorTime;
-        DateTime realTime2 = DateTime.UtcNow;
-        double CpuUsage = (processTime2 - processTime1).TotalMilliseconds / ((realTime2 - realTime1).TotalMilliseconds * Environment.ProcessorCount) * 100;
-
-        return CpuUsage;
+        //...
     }
 }
