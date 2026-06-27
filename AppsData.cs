@@ -27,16 +27,24 @@ class AppsData
     }
     public static string[] GetMetrics(string name)
     {
-        using Process process = Process.GetProcessesByName(name).FirstOrDefault();
-        TimeSpan processTime1 = process.TotalProcessorTime;
-        DateTime realTime1 = DateTime.UtcNow;
-        Thread.Sleep(1000);
-        TimeSpan processTime2 = process.TotalProcessorTime;
-        DateTime realTime2 = DateTime.UtcNow;
-        double CpuUsage = (processTime2 - processTime1).TotalMilliseconds / ((realTime2 - realTime1).TotalMilliseconds * Environment.ProcessorCount) * 100;
+        try
+        {
+            using Process process = Process.GetProcessesByName(name).FirstOrDefault();
+            TimeSpan processTime1 = process.TotalProcessorTime;
 
-        TimeSpan uptime = DateTime.Now - process.StartTime;
-        double ramUsage = process.WorkingSet64 / 1024.0 / 1024.0;
-        return [uptime.ToString(), CpuUsage.ToString(), ramUsage.ToString()];
+            DateTime realTime1 = DateTime.UtcNow;
+            Thread.Sleep(1000);
+            TimeSpan processTime2 = process.TotalProcessorTime;
+            DateTime realTime2 = DateTime.UtcNow;
+            double CpuUsage = (processTime2 - processTime1).TotalMilliseconds / ((realTime2 - realTime1).TotalMilliseconds * Environment.ProcessorCount) * 100;
+
+            TimeSpan uptime = DateTime.Now - process.StartTime;
+            double ramUsage = process.WorkingSet64 / 1024.0 / 1024.0;
+            return [uptime.ToString(), CpuUsage.ToString(), ramUsage.ToString()];
+        }
+        catch
+        {
+            return ["00:00:00", "0", "0"];
+        }
     }
 }

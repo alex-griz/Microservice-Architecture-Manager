@@ -196,6 +196,34 @@ class Commands
             summary_cpu = summary_cpu + Convert.ToDouble(metrics[1]);
             summary_ram = summary_ram + Convert.ToDouble(metrics[2]);
         }
-        //...
+        Console.WriteLine("Global problems:");  //CPU and RAM overloading
+        if (summary_cpu > 90)
+        {
+            Console.WriteLine("CPU is overloaded! (" + summary_cpu + "%)");
+        }
+        if (summary_ram > 90)
+        {
+            Console.WriteLine("RAM is overloaded! (" + summary_ram + "%)");
+        }
+        Console.WriteLine("Local problems:"+"\n");
+        foreach(string name in names)
+        {
+            if (status_list[name] == 0)   //Service is disabled
+            {
+                Console.WriteLine("Service " + name + " is disabled");
+            }
+            string[] dependencies = AppsData.GetData(name)[2].Split(';');
+            foreach(string dependency in dependencies)
+            {
+                if (dependency != "" && status_list.ContainsKey(dependency) && status_list[dependency] == 0)   //Dependence is disabled
+                {
+                    Console.WriteLine("Service " + name + " has disabled dependency: " + dependency);
+                }
+            }
+            Console.WriteLine($"Service {name} has errors in work:");
+            Errors(name);   //Errors from logs
+
+            Console.WriteLine("\n");
+        }
     }
 }
