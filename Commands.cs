@@ -133,13 +133,20 @@ class Commands
             Console.WriteLine("This service don't have log files!");
             return;
         }
-        foreach (string line in File.ReadLines(path))
+        try
         {
-            string newLine = line.ToLower();
-            if (newLine.Contains("error"))
+            foreach (string line in File.ReadLines(path))
             {
-                Console.WriteLine(line);
+                string newLine = line.ToLower();
+                if (newLine.Contains("error"))
+                {
+                    Console.WriteLine(line);
+                }
             }
+        }
+        catch
+        {
+            Console.WriteLine("Error while opening log file");
         }
     }
     public static void List()
@@ -222,8 +229,6 @@ class Commands
             }
             Console.WriteLine($"Service {name} has errors in work:");
             Errors(name);   //Errors from logs
-
-            Console.WriteLine("\n");
         }
     }
 }

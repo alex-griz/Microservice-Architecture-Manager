@@ -6,6 +6,7 @@ class Program
     static void Main()
     {
         DataBase db = new DataBase();
+        //db.CreateDB();
         nameCache = db.LoadCache();
         Console.WriteLine("===   Welcome to MicroService Manager!   ===");
         while (true)
@@ -17,7 +18,7 @@ class Program
             switch (cmd_args[0])
             {
                 case "create":
-                    if (cmd_args.Length < 3) {Console.WriteLine("Using the command: create <name> <path> <log path (optional)> <dependence1;dependence2 (optional)"); break;}
+                    if (cmd_args.Length < 3){Console.WriteLine("Using the command: create <name> <path> <log path (optional)> <dependence1;dependence2 (optional)"); break;}
                     Commands.Create(cmd_args[1], cmd_args[2],  cmd_args.ElementAtOrDefault(3) ?? "", cmd_args.ElementAtOrDefault(4) ?? "");
                     break;
                 case "remove":
