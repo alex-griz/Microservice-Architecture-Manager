@@ -47,4 +47,11 @@ class AppsData
             return ["00:00:00", "0", "0"];
         }
     }
+    public static bool IsExecutable(string name)
+    {
+        string ext = Path.GetExtension(GetData(name)[0]);
+        var suitable_exts = new HashSet<string>{".py", ".ts", ".js", ".go", ".jar", ".sh", ".bat", ".exe"};
+        if (suitable_exts.Contains(ext)){return true;}
+        else{return false;}
+    }
 }

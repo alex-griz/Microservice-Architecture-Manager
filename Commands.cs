@@ -52,6 +52,7 @@ class Commands
             return;
         }
         string ext = Path.GetExtension(path);
+        if (AppsData.IsExecutable(name)){Console.WriteLine("This component is not intended to run"); return;}
         if (ext == ".exe")
         {
             try
@@ -76,21 +77,14 @@ class Commands
             ".bat" => "cmd /c",
             _ => null
         };
-        if (startCommand != null)
+        try
         {
-            try
-            {
-                Process.Start(startCommand, path);
-                Console.WriteLine("Component launched successfully");
-            }
-            catch
-            {
-                Console.WriteLine("Error while launching this component");
-            }
+            Process.Start(startCommand, path);
+            Console.WriteLine("Component launched successfully");
         }
-        else
+        catch
         {
-            Console.WriteLine("This component is not intended to run");
+            Console.WriteLine("Error while launching this component");
         }
     }
     public static void Stop(string name)
@@ -112,6 +106,7 @@ class Commands
     }
     public static void Stats(string name)
     {
+        if (!AppsData.IsExecutable(name)){Console.WriteLine("This service doesn't have metrics"); return;}
         int status = AppsData.GetStatus(name);
         if (status == 0)
         {
@@ -215,7 +210,7 @@ class Commands
         Console.WriteLine("Local problems:"+"\n");
         foreach(string name in names)
         {
-            if (status_list[name] == 0)   //Service is disabled
+            if (status_list[name] == 0 && AppsData.IsExecutable(name))   //Service is disabled
             {
                 Console.WriteLine("Service " + name + " is disabled");
             }
