@@ -226,4 +226,13 @@ class Commands
             Errors(name);   //Errors from logs
         }
     }
+    public static void Help()
+    {
+        using StreamReader reader = new StreamReader("help.txt");
+        string line;
+        while ((line = reader.ReadLine()) != null)
+        {
+            Console.WriteLine(line);
+        }
+    }
 }

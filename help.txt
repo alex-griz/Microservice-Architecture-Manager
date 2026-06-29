@@ -1,0 +1,17 @@
+!!!Arguments for all commands should be written WITHOUT < > symbols or spaces within the argument!!!
+
+COMMANDS:
+create <name> <path> <log path (optional)> <dependence1;dependence2 (optional)>           - Add a new microservice to the database
+remove <name>                                                                             - Delete microservice from the database
+edit <name> <new path> <new log path (optional)> <new dependence1;dependence2 (optional)> - modify information about an existing microservice in the database
+run <name>                                                                                - Launch the microservice (if possible)
+stop <name>                                                                               -  Stop the microservice (if possible)
+stats <name>                                                                              - Get information about the status and load of a microservice
+errors <name>                                                                             - Find information about operational errors in the microservice logs
+problems-analysis                                                                         - Conduct a detailed analysis of all possible causes of issues affecting the operation of the entire architecture and each individual microservice
+
+ARGUMENTS:
+name         - unique microservice name in the database
+path         - Full path to the microservice executable file
+log path     - Full path to the microservice operation log file (optional; supported for a single file, e.g., latest.log)
+dependencies - a list of microservices with which this microservice interacts during its operation (microservice names must be specified exactly as they appear in the database). Names should be listed separated by a symbol ";" , without spaces.
