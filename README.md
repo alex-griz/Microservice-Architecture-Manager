@@ -29,7 +29,7 @@ problems-analysis                                                               
 1. Download the archive containing the ready-to-use application, or the source code from the latest release.
 2. Ensure that .NET is installed on your device.
 3. If you have selected the archive, it already contains all the files necessary for operation, and you can start using it at this stage.
-4. **If you are using the source code**, you need to create a database file upon the first launch; to do this, create a 'Database' folder in the application directory before running the program, and uncomment the database file creation method in the `Program.cs` class.
+4. **If you are using the source code**, run the program using the `dotnet run` command from the console in the source code folder.
 
 
 

@@ -6,7 +6,7 @@ class Program
     static void Main()
     {
         DataBase db = new DataBase();
-        //db.CreateDB();
+        db.CreateDB();
         nameCache = db.LoadCache();
         Console.WriteLine("===   Welcome to MicroService Manager!   ===");
         while (true)
